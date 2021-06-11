@@ -17,6 +17,21 @@ type URLLink struct {
 	ExpireTime int64 `json:"expire_time,omitempty"`
 	// 到期失效的URL Link的失效间隔天数。生成的到期失效URL Link在该间隔时间到达前有效。最长间隔天数为365天。expire_type 为 1 必填
 	ExpireInterval int64 `json:"expire_interval,omitempty"`
+	// 云开发静态网站自定义 H5 配置参数，可配置中转的云开发 H5 页面。不填默认用官方 H5 页面
+	CloudBase *CloudBaseInfo `json:"cloud_base,omitempty"`
+}
+
+type CloudBaseInfo struct {
+	// 云开发环境
+	Env            string `json:"env"`
+	// 静态网站自定义域名，不填则使用默认域名
+	Domain         string `json:"domain,omitempty"`
+	// 云开发静态网站 H5 页面路径，不可携带 query
+	Path           string `json:"path,omitempty"`
+	// 云开发静态网站 H5 页面 query 参数，最大 1024 个字符，只支持数字，大小写英文以及部分特殊字符：!#$&'()*+,/:;=?@-._~
+	Query          string `json:"query,omitempty"`
+	// 第三方批量代云开发时必填，表示创建该 env 的 appid （小程序/第三方平台）
+	Resource_appid string `json:"resource_appid,omitempty"`
 }
 
 type URLLinkResponse struct {
