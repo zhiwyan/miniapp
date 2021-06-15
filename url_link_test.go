@@ -7,7 +7,7 @@ import (
 
 func TestGenerate(t *testing.T) {
 	link := URLLink{
-		Path: "",
+		Path: "/",
 		Query: "",
 		IsExpire: true,
 		ExpireType: 1,
