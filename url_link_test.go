@@ -6,7 +6,13 @@ import (
 )
 
 func TestGenerate(t *testing.T) {
-	link := URLLink{}
+	link := URLLink{
+		Path: "",
+		Query: "",
+		IsExpire: true,
+		ExpireType: 1,
+		ExpireInterval: 7,
+	}
 
 	res, err := link.Generate("acces-token")
 	if err != nil {
