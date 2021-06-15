@@ -12,7 +12,7 @@ type URLLink struct {
 	// 生成的 URL Link 类型，到期失效：true，永久有效：false
 	IsExpire bool `json:"is_expire,omitempty"`
 	// 小程序 URL Link 失效类型，失效时间：0，失效间隔天数：1
-	ExpireType int64 `json:"expire_type,omitempty"`
+	ExpireType int64 `json:"expire_type"`
 	// 到期失效的 URL Link 的失效时间，为 Unix 时间戳。生成的到期失效 URL Link 在该时间前有效。最长有效期为1年。expire_type 为 0 必填
 	ExpireTime int64 `json:"expire_time,omitempty"`
 	// 到期失效的URL Link的失效间隔天数。生成的到期失效URL Link在该间隔时间到达前有效。最长间隔天数为365天。expire_type 为 1 必填
