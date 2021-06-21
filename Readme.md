@@ -70,6 +70,8 @@ go get -u github.com/medivhzhan/weapp/v2
   - [getUnlimited](#getUnlimited) ✅
 - [URL-Scheme](#URL-Scheme)
   - [generate](#generate) ✅
+- [URL-Link](#URL-Link)
+  - [link_generate](#link_generate) ✅
 - [内容安全](#内容安全)
   - [imgSecCheck](#imgSecCheck) ✅
   - [mediaCheckAsync](#mediaCheckAsync)✅
@@ -1151,7 +1153,44 @@ if err := res.GetResponseError(); err !=nil {
 fmt.Printf("返回结果: %#v", res)
 
 ```
+---
 
+## URL-Link
+
+### link_generate
+
+[官方文档](https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/url-link.html)
+
+```go
+
+import (
+    "ioutil"
+    "github.com/medivhzhan/weapp/v2"
+)
+
+
+link := weapp.URLLink{
+    Path: "/",
+    Query: "mock/path",
+    IsExpire: true,
+    ExpireType: 1,
+    ExpireInterval: 7,
+}
+
+resp, res, err := link.Generate("access-token")
+if err != nil {
+    // 处理一般错误信息
+    return
+}
+
+if err := res.GetResponseError(); err !=nil {
+    // 处理微信返回错误信息
+    return
+}
+
+fmt.Printf("返回结果: %#v", res)
+
+```
 ---
 
 ## 内容安全
