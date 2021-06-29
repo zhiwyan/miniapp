@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/tls"
 	"encoding/json"
+	"fmt"
 	"io"
 	"math/rand"
 	"mime/multipart"
@@ -87,6 +88,7 @@ func postJSONWithBody(url string, params interface{}) (*http.Response, error) {
 			return nil, err
 		}
 	}
+	fmt.Println("=====",b.String())
 
 	return httpClient().Post(url, "application/json; charset=utf-8", b)
 }
