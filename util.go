@@ -2,7 +2,10 @@ package weapp
 
 import (
 	"bytes"
+	"crypto/aes"
+	"crypto/cipher"
 	"crypto/tls"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -158,4 +161,124 @@ func bool2int(ok bool) uint8 {
 	}
 
 	return 0
+}
+
+//--------- aes256加解密
+
+func EncodeBase64(b []byte) string {
+	return base64.StdEncoding.EncodeToString(b)
+}
+
+func DecodeBase64(s string) ([]byte, error) {
+	data, err := base64.StdEncoding.DecodeString(s)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+func PKCS7Padding(text []byte, blockSize int) []byte {
+	padding := blockSize - len(text)%blockSize
+	padtext := bytes.Repeat([]byte{byte(padding)}, padding)
+	padtext = append(text, padtext...)
+	return padtext
+}
+
+func PKCS7UnPadding(text []byte) []byte {
+	length := len(text)
+	unpadding := int(text[length-1])
+	return text[:(length - unpadding)]
+}
+
+// 补0
+func ZeroPadding(ciphertext []byte, blockSize int) []byte {
+	padding := blockSize - len(ciphertext)%blockSize
+	padtext := bytes.Repeat([]byte{0}, padding)
+	return append(ciphertext, padtext...)
+}
+
+func ZeroUnPadding(origData []byte) []byte {
+	length := len(origData)
+	unpadding := int(origData[length-1])
+	return origData[:(length - unpadding)]
+}
+
+// 获取随机字符byte
+func GetRandomByte(length int) []byte {
+	str := "0123456789abcdefghijklmnopqrstuvwxyz"
+	strLen := len(str)
+	strBytes := []byte(str)
+	result := []byte{}
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	for i := 0; i < length; i++ {
+		result = append(result, strBytes[r.Intn(strLen)])
+	}
+	return result
+}
+
+func getIv(length int) []byte {
+	str := "0123456789abcdefghijklmnopqrstuvwxyz"
+	strBytes := []byte(str)
+	result := []byte{}
+	for i := 0; i < length; i++ {
+		result = append(result, strBytes[i])
+	}
+	return result
+}
+
+//aes256cbc加密
+func Encrypt(key string, data string) (string, error) {
+	// 获取key
+	keyByte := []byte(key)
+
+	// 选取加密算法
+	block, err := aes.NewCipher(keyByte)
+	if err != nil {
+		return "", err
+	}
+
+	// pkcs7补位
+	text := PKCS7Padding([]byte(data), block.BlockSize())
+
+	//iv
+	//iv := GetRandomByte(block.BlockSize())
+	iv := getIv(block.BlockSize())
+
+	//加密
+	cbc := cipher.NewCBCEncrypter(block, iv)
+	ciphertext := make([]byte, len(text))
+	cbc.CryptBlocks(ciphertext, text)
+
+	//base64加密
+	ciphertextStr := EncodeBase64(ciphertext)
+	return ciphertextStr, nil
+}
+
+func Decrypt(key string, b64 string) (string, error) {
+	// 获取key
+	keyByte := []byte(key)
+
+	//base64解密
+	ciphertext, err := DecodeBase64(b64)
+	if err != nil {
+		return "", err
+	}
+
+	// 选取加密算法
+	block, err := aes.NewCipher(keyByte)
+	if err != nil {
+		return "", err
+	}
+
+	//iv
+	iv := getIv(block.BlockSize())
+
+	//解密
+	text := make([]byte, len(ciphertext))
+	cbc := cipher.NewCBCDecrypter(block, iv)
+	cbc.CryptBlocks(text, ciphertext)
+
+	// 反解pkcs7补位
+	text = PKCS7UnPadding(text)
+	return string(text), nil
 }
